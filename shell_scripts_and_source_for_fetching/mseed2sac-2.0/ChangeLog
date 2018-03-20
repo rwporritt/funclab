@@ -1,0 +1,126 @@
+2013.271: 2.0
+	- Update to libmseed 2.12.
+	- Add -z option to write all SAC files to a ZIP archive.  The
+	ZIP can be written to stdout.
+
+2013.242:
+	- Add check of derived sample rate versus reported sample rate.
+	- Add -dr option to use the derived sample rate over the reported rate,
+	this assumes that the timing is more accurate than the sampling rate.
+
+2013.221:
+	- Update to libmseed 2.11.
+	- Change generated output file names to (no colons or commas):
+	  Net.Sta.Loc.Chan.Qual.YYYY.DDD.HHMMSS.SAC
+	which is consistent between between various operating systems.
+	The previously generated file name patterns were:
+	  Net.Sta.Loc.Chan.Qual.YYYY,DDD,HH:MM:SS.SAC (non-Windows)
+	  Net.Sta.Loc.Chan.Qual.YYYY.DDD.HH_MM_SS.SAC (Windows)
+
+	- Add -ic option to process each input channel individually.  When
+	a new channel is detected all data previously read will be
+	written.  Allows processing of very large input files without
+	holding all of the data in memory.  Input miniSEED data should be
+	well ordered, with all records for a channel contiguous in the
+	file, when using this option.
+
+2013.066: 1.9
+	- Update to libmseed 2.10.
+	- Change code to caluclate and populate station-event relative headers
+	(az, baz, gcarc, dist) when a metadata file is used, previously this
+	only worked when the station coordinates were supplied as command line
+	options.
+	- Fix detection of bad or incomplete lines in metadata file.
+
+2012.216: 1.8
+	- Allow metadata files to be delimited with vertical bars (|) in
+	addition to commas.
+	- When metadata files are delimited with vertical bars, assume the
+	inclination is in SEED dip convention and convert to a SAC inclination.
+	- Add logic to avoid overwriting existing file names, allows traces
+	with the same start time to be converted.
+	- Add -O option to explicitly overwrite existing files to support
+	previous behavior.
+
+2011.301:
+	- Change time values in file names to be zero padded.
+
+2011.066: 1.7
+	- Change SEED naming override options to upper case (-N, -S, -L, -C).
+	- Add -l option to take a selection list file to limit input data.
+	- Add Makefile.win for MSVC Nmake.
+
+2011.063:
+	- Update to libmseed 2.6.
+	- Create alternate output file names for Win32 that do not include 
+	colon or comma characters, thanks to Claus Milkereit for reporting.
+	- Fix crash for incomplete metadata lines, thanks to John Nabelek
+	for reporting.
+	- Reorganize help/usage message to common and extended versions, 
+	use -h to get only common options and -H to get extended options.
+
+2011.007:
+	- Rework loop in SAC Alpha writing to avoid warning in newer GCCs.
+
+2010.355: 1.6
+	- Change format of metadata file and include new fields. A time
+	window can now be specified in the metadata file and is used to
+	match with appropriate data segments.
+	- Allow comment lines in metadata file beginning with '#'.
+	- Add warning when no metadata is available for inserting but a
+	metadata file was suppliled.
+
+2010.305:
+	- Fix conversion for event time to not trim subseconds.
+
+2010.138: 1.5
+	- Update to libmseed 2.5.1.
+	- Add -msi option to convert the component inclination in a supplied
+	metadata file from SEED (dip) to SAC convention by adding 90 degrees.
+
+2008.220: 1.4
+	- Update to libmseed 2.1.6.
+
+2007.284: 1.3
+	- Update to libmseed 2.1.4.
+	- Change src/Makefile to use user defined CFLAGS if specified.
+
+2007.142: 1.2
+	- Update to libmseed 2.1.1.
+	- Fix reading of metadata file making it much more robust and
+	clarify it's usage in the man page.
+
+2007.133:
+	- Store any sub-millisecond portion of the time in the begin (b)
+	and end (e) header variables, these are offsets from the reference
+	time which has only millisecond resolution.
+
+2006.208: 1.1
+	- Update to libmseed 1.8.
+	- Use new get_errorstr() function for file read errors to print
+	a useful diagnostic message.
+	- Add gcc32, gcc32debug and gcc64debug targets to Makefile.
+
+2006.184: 1.0
+	- Update to libmseed 1.7.
+
+2006.148: 0.4
+	- Fix -k option to accept a negative latitudes (previously
+	recognized as other command line options).
+
+2006.138: 0.3
+	- Add metadata file option to specify a file containing
+	coordinates, scaling, orientation, etc.
+	- Write man page.
+
+2006.129:
+	- Add delta, dist, azimuth and back azimuth calculation when
+	both event and station coordinates are known.  Values are inserted
+	into the appropriate SAC headers.
+
+2006.127:
+	- Add -E option to specify event information that will be inserted
+	into the SAC header event variables.
+
+2006.125: 0.1
+	- Initial version. 

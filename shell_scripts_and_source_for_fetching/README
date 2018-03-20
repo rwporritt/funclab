@@ -1,0 +1,24 @@
+The tools here are designed to help you download data from IRIS and then prepare the downloaded data for FuncLab
+
+Everything you need should be here, aside from a couple PERL libraries needed for FetchEvent and FetchData.
+First, compile codes mseed2sac
+  cd mseed2sac-2.0
+  make
+  cp mseed2sac ~/bin 
+  cd ../
+where ~/bin is some directory on your search path
+and then compile c utilities
+  cd c_utils
+  make
+  cd ../
+
+Then edit request_data.tcsh for your desired region, incident phase, minimum magnitude, distance window, etc...
+You may also wish to adjust the FetchData call. Particularily the -F, -M, and -O commands are useful for gathering data from multiple datacenters (where -M replaces -m and -O replaces -o)
+
+Run request_data.tcsh and wait while it downloads data.
+
+Once the data is downloaded, use prep_data_for_funclab.tcsh
+This requires sac and saclst utilities. They are available from IRIS.
+There shouldn't be much need to adjust things, but turn off the system beep if you can and you may wish to adjust the output dt variable at the top
+
+

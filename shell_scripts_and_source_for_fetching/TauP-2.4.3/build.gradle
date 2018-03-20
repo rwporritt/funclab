@@ -1,0 +1,44 @@
+group = "edu.sc.seis"
+version = "2.4.3_localMod"
+
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'eclipse'
+
+repositories {
+    flatDir name: 'localRepository', dirs: 'lib'
+    mavenRepo url: "http://www.seis.sc.edu/software/maven2"
+    mavenCentral()
+}
+defaultTasks "clean", "jar"
+
+dependencies {
+        compile "edu.sc.seis:seisFile:1.7.4-SNAPSHOT"
+        compile "edu.sc.seis:seedCodec:1.0.11"
+        compile "com.martiansoftware:jsap:2.1"
+        compile "org.slf4j:slf4j-api:1.7.21"
+        compile "org.slf4j:slf4j-log4j12:1.7.21"
+        compile "org.rxtx:rxtx:2.1.7"
+        compile "org.codehaus.woodstox:woodstox-core-lgpl:4.4.1"
+        compile "net.java.dev.msv:msv-core:2013.6.1"
+        compile "org.apache.httpcomponents:httpclient:4.5.3"
+        compile "mysql:mysql-connector-java:5.1.39"
+        testCompile "junit:junit:4.11"
+
+}
+
+
+task sourceJar(type: Jar) {
+    description = 'Builds a source jar artifact suitable for maven deployment.'
+    classifier = 'sources'
+    from sourceSets.main.java
+}
+task javadocJar(type: Jar, dependsOn:javadoc) {
+     classifier = 'javadoc'
+     from javadoc.destinationDir
+}
+artifacts {
+    archives sourceJar
+    archives javadocJar
+}
+sourceCompatibility = 1.7
