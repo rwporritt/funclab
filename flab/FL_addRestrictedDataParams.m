@@ -2,6 +2,8 @@
 %  username and password in edit fields, confirm with one button or cancel
 %  with the other
 %  Rob Porritt, July 2014
+% Edit, RWP, 9.19.2018 - removed the keypress function which makes the
+% password disappear as it's typed.
 
 function FL_addRestrictedDataParams(cbo, eventdata)
 
@@ -52,8 +54,7 @@ textHandles2 =  uicontrol('Parent',encryptedPanel,'Units','pixel',...
     'Position',[p(3)*.32 p(4)*.5 p(3)*.50 20],...
     'String', '*','Tag','passwordEntryEdit',...
     'UserData', password,...
-    'FontName','FixedWidth','ToolTipString','Input password for restricted data access',...
-    'KeyPressFcn',{@keypress_hidePassword});
+    'FontName','FixedWidth','ToolTipString','Input password for restricted data access');
  %   'Callback','tmpConfig.restrictedAccessPassword=get(gcbo,''String'');');
 %  
 %    % three buttons
