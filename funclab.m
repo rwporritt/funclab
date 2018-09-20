@@ -110,7 +110,9 @@ function funclab
 %   is passed around within that function. Fixed in this version
 %   moho manual picking adjusted to allow proper handling of added stations
 %   after the GUI has already been run.
-
+% Version 1.8.2: MSM found an error when downloading BH1, BH2, BHZ
+% restricted data. RWP updated to make encrypted info sticky and properly
+% do rotation assuming BH1 is north.
 
 %--------------------------------------------------------------------------
 % Setup dimensions of the GUI
@@ -130,7 +132,8 @@ function funclab
 %Version = 'Funclab1.7.9'; % October 19th, 2016 - New view tools to view cross sections of groups of receiver functions either in the depth or time domain
 %Version = 'Funclab1.7.10'; % November 4th, 2016. New addon to allower user to manually pick the moho
 %Version = 'Funclab1.8.0'; % December 26th, 2016. Addition of citations menu and dilating CCP addon
-Version = 'Funclab1.8.1'; % October 24th, 2017. Fixed bug when sorting trace editing and in moho manual pick
+%Version = 'Funclab1.8.1'; % October 24th, 2017. Fixed bug when sorting trace editing and in moho manual pick
+Version = 'Funclab1.8.2'; % September 19th, 2018. Fixed downloading bugs and updated NWUS mod. Also found fl_hann was missing from utilities in version 1.8.1
 MainPos = [0 0 165 55];
 WelcomePos1 = [0 40 MainPos(3) 3];
 WelcomePos2 = [5 30 MainPos(3) 1.5];
@@ -1117,7 +1120,7 @@ AboutGui = dialog('Name','About FuncLab','Resize','off','NumberTitle','off','Tag
 uicontrol ('Parent',AboutGui,'Style','text','Units','characters','String','FuncLab',...
     'Position',[3 6.5 34 2],'FontWeight','bold','FontSize',14);
 uicontrol ('Parent',AboutGui,'Style','text','Units','characters',...
-    'String','Version 1.8.1',...
+    'String','Version 1.8.2',...
     'Position',[3 5.75 34 1.5],'FontSize',8);
 uicontrol ('Parent',AboutGui,'Style','text','Units','characters',...
     'String',{'Email: rwporritt@gmail.com';'Home Page: http://robporritt.wordpress.com/software'},...
@@ -1579,12 +1582,12 @@ else
     if length(FuncLabPreferences) == 18
         FuncLabPreferences{19} = 'parula.cpt';
         FuncLabPreferences{20} = false;
-        FuncLabPreferences{21} = '1.8.1';
+        FuncLabPreferences{21} = '1.8.2';
     elseif length(FuncLabPreferences) == 19
         FuncLabPreferences{20} = false;
-        FuncLabPreferences{21} = '1.8.1';
+        FuncLabPreferences{21} = '1.8.2';
     elseif length(FuncLabPreferences) == 20
-        FuncLabPreferences{21} = '1.8.1';
+        FuncLabPreferences{21} = '1.8.2';
     end
 end
 if evalin('base','~exist(''TraceEditPreferences'',''var'')')
@@ -3274,6 +3277,8 @@ mkdir(ProjectDirectory)
 mkdir([ProjectDirectory 'RAWDATA'])
 mkdir([ProjectDirectory 'RAWTRACES'])
 mkdir([ProjectDirectory 'FIGURES'])
+mkdir([ProjectDirectory 'SACGARDEN'])
+TracesWriteString = sprintf('WRITESAC:%sSACGARDEN',ProjectDirectory);
 
 
 %% get the user input data
@@ -3309,6 +3314,7 @@ rfProcessingInfo = get(rfProcessingPanelHandles,'UserData');
 %  gaussian2, decontype2, waterlevel2, maxiteration2, minerror2,
 %  incidentphase1, incidentphase2
 encryptedInfo = get(encryptedPanelHandles,'UserData');
+save('junk.mat','encryptedInfo')
 
 
 %% Station info has been found to have numerous duplicates, so use unique to
@@ -3399,7 +3405,7 @@ rawTracesFileNames = cell(nevents,nstations*2); % allows for 2 location codes pe
 % code and channel codes for the time frame requested. :(
 
 %% Loop through each event
-for ievent = 1:nevents;
+for ievent = 1:nevents
     eventLatitude = eventInfo.OriginLatitude{ievent};
     eventLongitude = eventInfo.OriginLongitude{ievent};
     eventDepth = eventInfo.OriginDepth{ievent};
@@ -3413,7 +3419,7 @@ for ievent = 1:nevents;
     % Going with one station at a time as its easiest to deal with, but
     % going for all at once may be faster
     iistation = 0;
-    for istation = 1:nstations;
+    for istation = 1:nstations
         % Init the start and end times for debug
         eventTime = irisTimeStringToEpoch(eventInfo.OriginTime{ievent});
         startTimeString = epochTimeToIrisString(eventTime+(traceStartSecondsOffset/24/60/60));
@@ -3481,15 +3487,16 @@ for ievent = 1:nevents;
             end
              if exist('startTimeString','var') && exist('endTimeString','var') && startTimeFlag == 1 && endTimeFlag == 1
                 fprintf('Fetching data for station %s\n',cleanStationInfo.stations{istation});
+                load('junk.mat');
 
                 %% Switches for encrypted data access
                 %if ievent == 1
                     if isempty(encryptedInfo{1}) || isempty(encryptedInfo{2})
-                        dataTraces = irisFetch.Traces(cleanStationInfo.networks{istation},cleanStationInfo.stations{istation},'*','?H?',startTimeString, endTimeString, serviceDataCenter,'includePZ','verbose');
+                        dataTraces = irisFetch.Traces(cleanStationInfo.networks{istation},cleanStationInfo.stations{istation},'*','?H?',startTimeString, endTimeString, serviceDataCenter,'includePZ','verbose',TracesWriteString);
                     else
                         %fprintf('%s %s\n',encryptedInfo{1}, encryptedInfo{2});
                         %fprintf('%s %s %s %s %s\n',cleanStationInfo.networks{istation},cleanStationInfo.stations{istation}, startTimeString, endTimeString, serviceDataCenter);
-                        dataTraces = irisFetch.Traces(cleanStationInfo.networks{istation},cleanStationInfo.stations{istation},'*','?H?',startTimeString, endTimeString, serviceDataCenter,'includePZ','verbose',encryptedInfo);
+                        dataTraces = irisFetch.Traces(cleanStationInfo.networks{istation},cleanStationInfo.stations{istation},'*','?H?',startTimeString, endTimeString, serviceDataCenter,'includePZ','verbose',TracesWriteString,encryptedInfo);
                     end
                 %else
                 %    dataTraces = irisFetch.Traces(cleanStationInfo.networks{istation},cleanStationInfo.stations{istation},'*','?H?',startTimeString, endTimeString, serviceDataCenter,'includePZ','verbose');
@@ -3523,9 +3530,16 @@ for ievent = 1:nevents;
                 %% Check for the ideal, but almost never real case of only 3
                 % traces (one per channel)
                 if ntraces == 3
-                    interpedMergedData{1} = dataTraces(1);
-                    interpedMergedData{2} = dataTraces(2);
-                    interpedMergedData{3} = dataTraces(3);
+                    for itrace=1:ntraces
+                        if strcmp(dataTraces(itrace).channel(3),'2') || strcmp(dataTraces(itrace).channel(3),'E') || strcmp(dataTraces(itrace).channel(3),'5')
+                           jtrace = 1;
+                        elseif strcmp(dataTraces(itrace).channel(3),'1') || strcmp(dataTraces(itrace).channel(3),'N') || strcmp(dataTraces(itrace).channel(3),'4')
+                           jtrace = 2;
+                        else
+                           jtrace = 3;
+                        end
+                        interpedMergedData{jtrace} = dataTraces(itrace);
+                    end
                     %% Check to interpolate to output time array
                     for itrace = 1:ntraces
                        obtainedTimeArray = linspace(dataTraces(itrace).startTime, dataTraces(itrace).endTime, dataTraces(itrace).sampleCount);
@@ -3540,7 +3554,7 @@ for ievent = 1:nevents;
                            
                        interpedMergedData{jtrace}.data = interpolatedAmplitude;
                        interpedMergedData{jtrace}.sampleRate = traceSampleRate;
-                       interpedMergedData{jtrace}.sampleCount = length(interpedMergedData{itrace}.data);
+                       interpedMergedData{jtrace}.sampleCount = length(interpolatedAmplitude);
                        interpedMergedData{jtrace}.startTime = startTimeEpoch;
                        interpedMergedData{jtrace}.endTime = endTimeEpoch;
                        
@@ -3972,7 +3986,7 @@ for ievent = 1:nevents;
                                 interpedMergedData{2} = dataTraces(keptchans1(1));
                                 interpedMergedData{2}.data = zeros(1,length(interpolatedAmplitude));
                                 interpedMergedData{2}.data = interpolatedAmplitude;
-                                interpedMergedData{2}.sampleCount = length(interpedMergedData{1}.data);
+                                interpedMergedData{2}.sampleCount = length(interpedMergedData{2}.data);
                                 interpedMergedData{2}.sampleRate = traceSampleRate;
                                 interpedMergedData{2}.endTime = endTimeEpoch;
                                 interpedMergedData{2}.startTime = startTimeEpoch;
@@ -3985,7 +3999,7 @@ for ievent = 1:nevents;
                                 interpedMergedData{2}.data = zeros(1,length(interpolatedAmplitude));
                                 interpedMergedData{2}.data = interpolatedAmplitude;
                                 interpedMergedData{2}.sampleRate = traceSampleRate;
-                                interpedMergedData{2}.sampleCount = length(interpedMergedData{1}.data);
+                                interpedMergedData{2}.sampleCount = length(interpedMergedData{2}.data);
                                 interpedMergedData{2}.startTime = startTimeEpoch;
                                 interpedMergedData{2}.endTime = endTimeEpoch;
                             end
@@ -4036,7 +4050,7 @@ for ievent = 1:nevents;
                                 interpedMergedData{1} = dataTraces(keptchans2(1));
                                 interpedMergedData{1}.data = zeros(1,length(interpolatedAmplitude));
                                 interpedMergedData{1}.data = interpolatedAmplitude;
-                                interpedMergedData{1}.sampleCount = length(interpedMergedData{2}.data);
+                                interpedMergedData{1}.sampleCount = length(interpedMergedData{1}.data);
                                 interpedMergedData{1}.sampleRate = traceSampleRate;
                                 interpedMergedData{1}.endTime = endTimeEpoch;
                                 interpedMergedData{1}.startTime = startTimeEpoch;
@@ -4049,7 +4063,7 @@ for ievent = 1:nevents;
                                 interpedMergedData{1}.data = zeros(1,length(interpolatedAmplitude));
                                 interpedMergedData{1}.data = interpolatedAmplitude;
                                 interpedMergedData{1}.sampleRate = traceSampleRate;
-                                interpedMergedData{1}.sampleCount = length(interpedMergedData{2}.data);
+                                interpedMergedData{1}.sampleCount = length(interpedMergedData{1}.data);
                                 interpedMergedData{1}.startTime = startTimeEpoch;
                                 interpedMergedData{1}.endTime = endTimeEpoch;
                             end
@@ -4538,7 +4552,7 @@ else
     if length(FuncLabPreferences) < 21
         FuncLabPreferences{19} = 'parula.cpt';
         FuncLabPreferences{20} = false;
-        FuncLabPreferences{21} = '1.8.1';
+        FuncLabPreferences{21} = '1.8.2';
     end
 end
 

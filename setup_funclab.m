@@ -24,7 +24,7 @@ function setup_funclab
 %      Qin Li
 %      funclabX.X.X/processRFmatlab - codes for the processing of receiver
 %      functions from Iain Bailey
-%      funclabX.X.X/IRIS-WS-2.0.15.jar - allows retrieval of data from
+%      funclabX.X.X/IRIS-WS-2.0.18.jar - allows retrieval of data from
 %      webservice enabled dataservers
 %      
 %
@@ -115,7 +115,8 @@ disp('----------------------------------------------------------------------')
 %disp('Funclab Version 1.7.9') % 10/19/2016: New RF cross section tools under the view menu
 %disp('Funclab Version 1.7.10') % 11/4/2016: Added manual moho picking addon
 %disp('Funclab Version 1.8.0') % 12/26/2016: Added citations menu
-disp('Funclab Version 1.8.1') % 10/24/2017: Fixed bug in sorting trace edits and manual moho picking
+%disp('Funclab Version 1.8.1') % 10/24/2017: Fixed bug in sorting trace edits and manual moho picking
+disp('Funclab Version 1.8.2') % 9/19/2018: Fixed bugs in data downloading, hann taper, and nwus model
 
 disp(' ')
 %disp('Adding FuncLab1.5.3 receiver function seismic tools to your MATLAB paths')  %11/12/2011: UPDATED VERSION NUMBER FROM 1.5.2 TO 1.5.3
@@ -126,7 +127,8 @@ disp(' ')
 %disp('Adding FuncLab1.7.9 receiver function seismic tools to your MATLAB paths') % 10/19/2016
 %disp('Adding FuncLab1.7.10 receiver function seismic tools to your MATLAB paths') % 11/04/2016
 %disp('Adding FuncLab1.8.0 receiver function seismic tools to your MATLAB paths') % 12/26/2016
-disp('Adding FuncLab1.8.1 receiver function seismic tools to your MATLAB paths') % 10/24/2017
+%disp('Adding FuncLab1.8.1 receiver function seismic tools to your MATLAB paths') % 10/24/2017
+disp('Adding FuncLab1.8.2 receiver function seismic tools to your MATLAB paths') % 9/19/2018
 
 disp(' ')
 
@@ -203,19 +205,19 @@ if jarinstallmethod == 1
     % First update dynamic path
     javaaddpath([FuncLabPath, filesep, 'matTaup',filesep, 'matTaup', filesep, 'lib', filesep, 'matTaup.jar'],'-end');
     javaaddpath([FuncLabPath, filesep, 'matTaup',filesep, 'matTaup', filesep, 'lib', filesep, 'matTaup.jar'],'-end');
-    javaaddpath([FuncLabPath, filesep, 'IRIS-WS-2.0.15.jar'],'-end');
+    javaaddpath([FuncLabPath, filesep, 'IRIS-WS-2.0.18.jar'],'-end');
     % Now add path to prefdir/javaclasspath.txt
     fid = fopen([prefdir, filesep, 'javaclasspath.txt'],'a+');
     fprintf(fid,'%s\n',[FuncLabPath, filesep, 'matTaup',filesep, 'matTaup', filesep, 'lib', filesep, 'matTaup.jar']);
     fprintf(fid,'%s\n',[FuncLabPath, filesep, 'matTaup',filesep, 'matTaup', filesep, 'lib', filesep, 'matTaupClasses.jar']);
-    fprintf(fid,'%s\n',[FuncLabPath, filesep, 'IRIS-WS-2.0.15.jar']);
+    fprintf(fid,'%s\n',[FuncLabPath, filesep, 'IRIS-WS-2.0.18.jar']);
     fclose(fid);
     % Some version may have sourced just classpath.txt, so we'll add that
     % here too for good measure
     fid = fopen([prefdir, filesep, 'classpath.txt'],'a+');
     fprintf(fid,'%s\n',[FuncLabPath, filesep, 'matTaup',filesep, 'matTaup', filesep, 'lib', filesep, 'matTaup.jar']);
     fprintf(fid,'%s\n',[FuncLabPath, filesep, 'matTaup',filesep, 'matTaup', filesep, 'lib', filesep, 'matTaupClasses.jar']);
-    fprintf(fid,'%s\n',[FuncLabPath, filesep], 'IRIS-WS-2.0.15.jar');
+    fprintf(fid,'%s\n',[FuncLabPath, filesep], 'IRIS-WS-2.0.18.jar');
     fclose(fid);
     
 elseif jarinstallmethod == 2
@@ -313,13 +315,13 @@ if installIrisWS
     if ~(matpath(end)==filesep)
         matpath=[matpath filesep];
     end
-    jfile = [matpath 'lib' filesep 'IRIS-WS-2.0.15.jar'];
+    jfile = [matpath 'lib' filesep 'IRIS-WS-2.0.18.jar'];
     jfiledir = [matpath 'lib' filesep];
     [success,~,~] = mkdir(jfiledir);
     if success == 0
         fprintf('Unable to create directory %s\nPlease add matTaup.jar and IRIS-WS jar file to your local path and update your classpath.txt file.\n',jfiledir)
     else
-        copyfile('IRIS-WS-2.0.15.jar',jfiledir);
+        copyfile('IRIS-WS-2.0.18.jar',jfiledir);
         fid   = fopen(clpath,'a+');
         if fid==-1
             commandwindow
