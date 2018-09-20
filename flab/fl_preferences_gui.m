@@ -49,16 +49,16 @@ if size(FuncLabPreferences) == 18
     % Assume version 1.5.4
     FuncLabPreferences{19} = 'parula.cpt';
     FuncLabPreferences{20} = false;
-    FuncLabPreferences{21} = '1.8.1';
+    FuncLabPreferences{21} = '1.8.2';
 end
 if size(FuncLabPreferences) == 19
     % Assume version 1.5.4
     FuncLabPreferences{20} = false;
-    FuncLabPreferences{21} = '1.8.1';
+    FuncLabPreferences{21} = '1.8.2';
 end
 if size(FuncLabPreferences) == 20
     % Assume version 1.5.4
-    FuncLabPreferences{21} = '1.8.1';
+    FuncLabPreferences{21} = '1.8.2';
 end
 
 
@@ -268,7 +268,7 @@ for n = [20]
     end
 end
 for n = [21]
-    FuncLabPreferences{n} = '1.8.1';
+    FuncLabPreferences{n} = '1.8.2';
 end
 
 ProjectDirectory = h.projdir;

@@ -26,7 +26,7 @@ edittedNegativeColor = [0 0 1];
 if length(FuncLabPreferences) < 21
     FuncLabPreferences{19} = 'vel.cpt';
     FuncLabPreferences{20} = false;
-    FuncLabPreferences{21} = '1.8.1';
+    FuncLabPreferences{21} = '1.8.2';
 end
 
 if FuncLabPreferences{20} == false

@@ -14,7 +14,7 @@ XInc = str2double(FuncLabPreferences{3});
 if length(FuncLabPreferences) < 21
     FuncLabPreferences{19} = 'parula.cpt';
     FuncLabPreferences{20} = false;
-    FuncLabPreferences{21} = '1.8.1';
+    FuncLabPreferences{21} = '1.8.2';
 end
 ColorMapChoice = FuncLabPreferences{19};
 

@@ -15,7 +15,7 @@ XInc = str2double(FuncLabPreferences{2});
 if length(FuncLabPreferences) < 21
     FuncLabPreferences{19} = 'vel.cpt';
     FuncLabPreferences{20} = false;
-    FuncLabPreferences{21} = '1.8.1';
+    FuncLabPreferences{21} = '1.8.2';
 end
 
 % Tohoku-Oki
